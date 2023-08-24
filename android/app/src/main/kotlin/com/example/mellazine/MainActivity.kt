@@ -1,0 +1,6 @@
+package com.example.mellazine
+
+import io.flutter.embedding.android.FlutterActivity
+
+class MainActivity: FlutterActivity() {
+}
