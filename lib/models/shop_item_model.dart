@@ -1,6 +1,7 @@
 class ShopItemModel {
   final String itemId;
   final String sellerId;
+  final String sellerHashTag;
   final List images;
   final String productName;
   final double price;
@@ -11,7 +12,7 @@ class ShopItemModel {
   final bool availability;
   double? oldPrice; // this is displayed as a crossed / strike-through figure
   Map? colors; // {'red':'imageURL'}
-  List? sizes;
+  Map? sizes; // {'XL':"Ush 250"}
   String? dimensions;
   String? weight;
   String? brand;
@@ -21,11 +22,26 @@ class ShopItemModel {
   String? category;
   List? tags;
   double? taxes;
-  Map? discounts; //{200 items: 10% discount}
-  Map? promoCode; //{'12fd':'15% off'}
-  String? shipping;
+  Map? discounts; // {200 items: 10% discount}
+  Map? promoCode; // {'12fd':'15% off'}
+  Map? shipping;
 
   ShopItemModel({
+    double? oldPrice, // this is displayed as a crossed / strike-through figure
+    this.colors, // {'red':'imageURL'}
+    this.sizes, // {'XL':"Ush 250"}
+    this.dimensions,
+    this.weight,
+    this.brand,
+    this.returnPolicy,
+    this.warranty,
+    this.customerSupport,
+    this.category,
+    this.tags,
+    this.taxes,
+    this.discounts, // {200 items: 10% discount}
+    this.promoCode, // {'12fd':'15% off'}
+    this.shipping,
     required this.itemId,
     required this.availability,
     required this.sellerId,
@@ -33,6 +49,7 @@ class ShopItemModel {
     required this.productName,
     required this.price,
     required this.sold,
+    required this.sellerHashTag,
     required this.starRating,
     required this.totalRaters,
     required this.inventory,
@@ -41,7 +58,8 @@ class ShopItemModel {
 
 final List<ShopItemModel> shopItemsList = [
   ShopItemModel(
-    sellerId:'kjafih',
+    sellerId: 'kjafih',
+    sellerHashTag: '@queenHund',
     itemId: 'coo',
     availability: true,
     images: [
@@ -61,6 +79,7 @@ final List<ShopItemModel> shopItemsList = [
     inventory: 25,
   ),
   ShopItemModel(
+    sellerHashTag: '@queenHund',
     availability: false,
     itemId: 'col',
     images: [
@@ -72,7 +91,7 @@ final List<ShopItemModel> shopItemsList = [
       'watch_5.png',
       'watch_6.png',
     ],
-    sellerId:'kjafih',
+    sellerId: 'kjafih',
     productName: 'Diamond Platinum ring',
     price: 650,
     sold: 100,
@@ -83,7 +102,7 @@ final List<ShopItemModel> shopItemsList = [
   ShopItemModel(
     availability: true,
     itemId: 'ool',
-    sellerId:'kjafih',
+    sellerId: 'kjafih',
     images: [
       'wakanda_forever.png',
       'watch_1.png',
@@ -93,6 +112,7 @@ final List<ShopItemModel> shopItemsList = [
       'watch_5.png',
       'watch_6.png',
     ],
+    sellerHashTag: '@queenHund',
     productName:
         'Wakanda necklace. The perfect necklace for the man of your style',
     price: 1000000,
@@ -103,7 +123,7 @@ final List<ShopItemModel> shopItemsList = [
   ),
   ShopItemModel(
     itemId: 'ol',
-    sellerId:'kjafih',
+    sellerId: 'kjafih',
     images: [
       'necklace_1.png',
       'watch_1.png',
@@ -118,10 +138,12 @@ final List<ShopItemModel> shopItemsList = [
     sold: 15,
     availability: true,
     starRating: 5,
+    sellerHashTag: '@queenHund',
     totalRaters: 1200,
     inventory: 25,
   ),
   ShopItemModel(
+    sellerHashTag: '@queenHund',
     itemId: 'l',
     images: [
       'necklace_2.png',
@@ -132,7 +154,7 @@ final List<ShopItemModel> shopItemsList = [
       'watch_5.png',
       'watch_6.png',
     ],
-    sellerId:'kjafih',
+    sellerId: 'kjafih',
     productName: "Angel's love",
     availability: true,
     price: 350000,
@@ -142,8 +164,8 @@ final List<ShopItemModel> shopItemsList = [
     inventory: 49,
   ),
   ShopItemModel(
-    itemId: 'cl',    sellerId:'kjafih',
-
+    itemId: 'cl',
+    sellerId: 'kjafih',
     images: [
       'watch_1.png',
       'ring_1.png',
@@ -154,6 +176,7 @@ final List<ShopItemModel> shopItemsList = [
       'watch_6.png',
     ],
     availability: true,
+    sellerHashTag: '@queenHund',
     productName: 'Obasanjo Gold ring',
     price: 7860000,
     sold: 698,
@@ -163,7 +186,7 @@ final List<ShopItemModel> shopItemsList = [
   ),
   ShopItemModel(
     itemId: 'cdool',
-    sellerId:'kjafih',
+    sellerId: 'kjafih',
     images: [
       'ring_2.png',
       'watch_1.png',
@@ -179,11 +202,13 @@ final List<ShopItemModel> shopItemsList = [
     sold: 100,
     starRating: 4.7,
     totalRaters: 18,
+    sellerHashTag: '@queenHund',
     inventory: 0,
   ),
   ShopItemModel(
     itemId: 'coerol',
-    availability: true,
+    sellerHashTag: '@queenHund',
+    availability: false,
     images: [
       'niel.png',
       'watch_1.png',
@@ -193,7 +218,7 @@ final List<ShopItemModel> shopItemsList = [
       'watch_5.png',
       'watch_6.png',
     ],
-    sellerId:'kjafih',
+    sellerId: 'kjafih',
     productName: 'Lovely Niel Lance and Loree Rowland perfect necklace',
     price: 1050000,
     sold: 42150,

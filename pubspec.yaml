@@ -20,12 +20,19 @@ dependencies:
   persistent_bottom_nav_bar_v2: ^4.2.8
   animated_text_kit: ^4.2.2
   liquid_swipe: ^3.1.0
+  badges: ^3.1.1
+  objectbox: ^2.2.1
+  objectbox_flutter_libs: ^2.2.1
+  fluttertoast: ^8.2.2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
   flutter_lints: ^2.0.0
+  # ObjectBox
+  build_runner: ^2.4.6
+  objectbox_generator: ^2.2.1
 
 flutter:
 

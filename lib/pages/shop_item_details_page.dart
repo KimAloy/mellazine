@@ -5,9 +5,10 @@ import 'package:liquid_swipe/liquid_swipe.dart';
 import 'package:mellazine/constants/constants.dart';
 import 'package:mellazine/models/review_modal.dart';
 import 'package:smooth_star_rating_null_safety/smooth_star_rating_null_safety.dart';
-
 import '../models/shop_item_model.dart';
+import '../repository/add_to_cart.dart';
 import '../repository/number_formatter.dart';
+import '../widgets/quantity_button.dart';
 
 class ShopItemsDetailsPage extends StatefulWidget {
   const ShopItemsDetailsPage({Key? key, required this.item}) : super(key: key);
@@ -61,7 +62,11 @@ class _ShopItemsDetailsPageState extends State<ShopItemsDetailsPage> {
         child: const Icon(Icons.add_shopping_cart_rounded),
         onPressed: () {
           // todo: implement
-          print('add to cart pressed');
+          // print('add to cart pressed');
+          addToCart(
+            item: widget.item,
+            quantity: _quantityInput,
+          ); // also displays toast
         },
       ),
       body: SingleChildScrollView(
@@ -279,14 +284,19 @@ class _ShopItemsDetailsPageState extends State<ShopItemsDetailsPage> {
   }
 
   Widget _price({required ShopItemModel item}) {
+    bool almostSoldOut = widget.item.inventory < kAlmostSoldOutQty;
+
     bool million = item.price > 999999;
     String price = numFormat(num: item.price);
     return Text(
       // todo: make currency '$' dynamic
       '\$${million ? '$price million' : price}',
       overflow: TextOverflow.ellipsis,
-      style: const TextStyle(
-          fontWeight: FontWeight.bold, fontSize: 18, color: Colors.deepOrange),
+      style: TextStyle(
+        fontWeight: FontWeight.bold,
+        fontSize: 18,
+        color: almostSoldOut ? Colors.deepOrange : Colors.black,
+      ),
     );
   }
 
@@ -356,56 +366,22 @@ class _ShopItemsDetailsPageState extends State<ShopItemsDetailsPage> {
           style: TextStyle(fontSize: 16),
         ),
         const SizedBox(width: 10),
-        _quantityButton(
-          onPressed: () {
-            print('reduce');
-            setState(() => _quantityInput--);
-          },
-          symbol: Icons.remove,
-        ),
-        const SizedBox(width: 10),
-        Text(
-          _quantityInput.toString(),
-          style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(width: 10),
-        _quantityButton(
-          onPressed: () {
-            print('increment');
-            setState(() => _quantityInput++);
-          },
-          symbol: Icons.add,
-        ),
-      ],
-    );
-  }
+        changeQuantity(
+            padding: 8,
+            context: context,
+            quantity: _quantityInput,
+            reduce: () {
+              // print('reduce');
+              if (_quantityInput > 1) {
+                setState(() => _quantityInput--);
+              }
+            },
+            increase: () {
+              // print('increment');
 
-  Widget _quantityButton({
-    required Function()? onPressed,
-    required IconData symbol,
-  }) {
-    final myColorTheme = Theme.of(context).colorScheme;
-    return GestureDetector(
-      onTap: onPressed,
-      child: Material(
-        elevation: 3,
-        borderRadius: BorderRadius.circular(5),
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(5),
-            color: myColorTheme.inversePrimary.withOpacity(0.4),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Center(
-              child: Icon(
-                symbol,
-                color: myColorTheme.primary,
-              ),
-            ),
-          ),
-        ),
-      ),
+              setState(() => _quantityInput++);
+            }),
+      ],
     );
   }
 

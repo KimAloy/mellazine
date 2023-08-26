@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:mellazine/pages/homepage.dart';
+import '../widgets/bottom_nav_bar.dart';
+import '../repository/my_object_box.dart';
+late MyObjectBox myObjectBox;
 
-void main() {
+Future main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  myObjectBox = await MyObjectBox.init();
   runApp(const MyApp());
 }
 
@@ -17,7 +21,8 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
 
       ),
-      home: const HomePage(),
+      // home: const HomePage(),
+      home: const BottomNavBar(),
     );
   }
 }

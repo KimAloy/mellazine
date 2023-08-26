@@ -56,7 +56,8 @@ class _HomePageState extends State<HomePage> {
                 _socialMediaIcons(),
                 const SizedBox(height: 35),
                 const Text(
-                  '50+ payment methods available. Cards & Mobile money supported',
+                  '50+ worldwide payment methods available. '
+                      'Cards & Mobile money supported.',
                   style: TextStyle(fontSize: 15,fontWeight: FontWeight.w500),
                   textAlign: TextAlign.center,
                 ),

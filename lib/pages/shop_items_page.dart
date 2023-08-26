@@ -2,11 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:smooth_star_rating_null_safety/smooth_star_rating_null_safety.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import '../constants/constants.dart';
+import '../main.dart';
 import '../models/shop_item_model.dart';
+import '../models/shopping_cart_model.dart';
+import '../repository/add_to_cart.dart';
+import '../repository/my_snack_bar.dart';
 import '../repository/number_formatter.dart';
 import 'shop_item_details_page.dart';
 
-class ShopItemsPage extends StatelessWidget {
+class ShopItemsPage extends StatefulWidget {
   const ShopItemsPage({
     Key? key,
     required this.accountHandle,
@@ -14,14 +18,16 @@ class ShopItemsPage extends StatelessWidget {
   final String accountHandle;
 
   @override
+  State<ShopItemsPage> createState() => _ShopItemsPageState();
+}
+
+class _ShopItemsPageState extends State<ShopItemsPage> {
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme
-            .of(context)
-            .colorScheme
-            .inversePrimary,
-        title: Text('Mellazine $accountHandle'),
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: Text('Mellazine ${widget.accountHandle}'),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -64,14 +70,17 @@ class ShopItemsPage extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         if (item.inventory == 0) {
-          ScaffoldMessenger.of(context)
-            ..removeCurrentSnackBar()
-            ..showSnackBar(
-              const SnackBar(content: Text('This item has been sold out')),
-            );
+          mySnackBar(
+            context: context,
+            message: 'This product has been sold out.',
+          );
+        } else if (item.availability == false) {
+          mySnackBar(
+            context: context,
+            message: 'This product is not available right now.',
+          );
         } else {
-          //todo: implement
-          print('navigate to next page ${item.productName}');
+          // print('navigate to next page ${item.productName}');
           Navigator.push(context, MaterialPageRoute(builder: (_) {
             return ShopItemsDetailsPage(item: item);
           }));
@@ -128,9 +137,7 @@ class ShopItemsPage extends StatelessWidget {
     highlyPriced = numFormat(num: double.parse(highlyPriced));
     return Text(
       // todo: make currency '$' dynamic
-      '\$${million ? '${highlyPriced}m' : price
-          ? '${highlyPriced}K'
-          : numFormat(num: item.price)}',
+      '\$${million ? '${highlyPriced}m' : price ? '${highlyPriced}K' : numFormat(num: item.price)}',
       overflow: TextOverflow.ellipsis,
       style: const TextStyle(
         fontWeight: FontWeight.w500,
@@ -177,36 +184,40 @@ class ShopItemsPage extends StatelessWidget {
 
   Widget _buildAnimatedText({required ShopItemModel item}) {
     const String justAddedToCart = 'just added to cart';
-    return item.availability == false ?_infoWidget(text: 'No longer available'): item.inventory == 0
-        ? _infoWidget(text: 'Sold out')
-        : SizedBox(
-      height: 13.5,
-      child: DefaultTextStyle(
-        style: const TextStyle(
-          fontSize: 12.5,
-          color: Colors.black,
-        ),
-        child: AnimatedTextKit(
-          repeatForever: true,
-          pause: const Duration(seconds: 3),
-          animatedTexts: [
-            FadeAnimatedText(justAddedToCart),
-            item.inventory < kAlmostSoldOutQty
-                ? FadeAnimatedText(
-              kAlmostSoldOutString,
-              textStyle: const TextStyle(color: Colors.deepOrange),
-            )
-                : FadeAnimatedText(justAddedToCart),
-            item.inventory < kOnlyLeftQty
-                ? FadeAnimatedText(
-              kOnlyLeftString(inventory: item.inventory),
-              textStyle: const TextStyle(color: Colors.deepOrange),
-            )
-                : FadeAnimatedText(justAddedToCart),
-          ],
-        ),
-      ),
-    );
+    return item.availability == false
+        ? _infoWidget(text: 'Not available right now')
+        : item.inventory == 0
+            ? _infoWidget(text: 'Sold out')
+            : SizedBox(
+                height: 13.5,
+                child: DefaultTextStyle(
+                  style: const TextStyle(
+                    fontSize: 12.5,
+                    color: Colors.black,
+                  ),
+                  child: AnimatedTextKit(
+                    repeatForever: true,
+                    pause: const Duration(seconds: 3),
+                    animatedTexts: [
+                      FadeAnimatedText(justAddedToCart),
+                      item.inventory < kAlmostSoldOutQty
+                          ? FadeAnimatedText(
+                              kAlmostSoldOutString,
+                              textStyle:
+                                  const TextStyle(color: Colors.deepOrange),
+                            )
+                          : FadeAnimatedText(justAddedToCart),
+                      item.inventory < kOnlyLeftQty
+                          ? FadeAnimatedText(
+                              kOnlyLeftString(inventory: item.inventory),
+                              textStyle:
+                                  const TextStyle(color: Colors.deepOrange),
+                            )
+                          : FadeAnimatedText(justAddedToCart),
+                    ],
+                  ),
+                ),
+              );
   }
 
   Widget _buildPriceSoldCart({required ShopItemModel item}) {
@@ -227,31 +238,35 @@ class ShopItemsPage extends StatelessWidget {
             ),
           ),
           item.inventory == 0 // item is sold out
-          || item.availability == false
+                  ||
+                  item.availability == false
               ? const SizedBox.shrink()
               : Row(
-            children: [
-              GestureDetector(
-                onTap: () {
-                  // todo: implement
-                  print('add to shopping cart tapped');
-                },
-                child: Container(
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15),
-                      border: Border.all(color: Colors.black)),
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: 8.0, vertical: 4),
-                    child: Icon(
-                      Icons.add_shopping_cart_outlined,
-                      size: 16,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        // print('add to shopping cart tapped');
+                        addToCart(
+                          item: item,
+                          quantity: 1,
+                        ); // displays toast when successful
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(15),
+                            border: Border.all(color: Colors.black)),
+                        child: const Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 8.0, vertical: 4),
+                          child: Icon(
+                            Icons.add_shopping_cart_outlined,
+                            size: 16,
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
-              ),
-            ],
-          ),
         ],
       ),
     );
@@ -261,7 +276,10 @@ class ShopItemsPage extends StatelessWidget {
     return Text(
       text,
       style: const TextStyle(
-        color: Colors.red, fontWeight: FontWeight.bold, fontSize: 12.5,),
+        color: Colors.red,
+        fontWeight: FontWeight.bold,
+        fontSize: 12.5,
+      ),
     );
   }
 }
