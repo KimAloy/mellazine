@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_credit_card/credit_card_brand.dart';
 import 'package:flutter_credit_card/flutter_credit_card.dart';
+import 'package:mellazine/main.dart';
+import 'package:mellazine/models/payment_card_model.dart';
+import 'package:mellazine/pages/payment_successful_page.dart';
 
 import '../widgets/my_colored_container_divider.dart';
 import '../widgets/security_sustainability_widget.dart';
@@ -13,6 +16,8 @@ class CreditCardPaymentPage extends StatefulWidget {
 }
 
 class _CreditCardPaymentPageState extends State<CreditCardPaymentPage> {
+  int _objectBoxCardId = 0;
+  String _errorMessage = '';
   String cardNumber = '';
   String expiryDate = '';
   String cardHolderName = '';
@@ -21,6 +26,25 @@ class _CreditCardPaymentPageState extends State<CreditCardPaymentPage> {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   bool rememberThisCard = true;
+
+  bool _objectBoxPaymentCardExists = false;
+
+  @override
+  void initState() {
+    List<int> paymentCardIds = myObjectBox.paymentCardsExist();
+    if (paymentCardIds.isNotEmpty) {
+      _objectBoxPaymentCardExists = true;
+      final PaymentCardModel firstCard =
+          myObjectBox.getPaymentCard(paymentCardIds[0])!;
+      _objectBoxCardId = firstCard.id;
+      cardNumber = firstCard.cardNumber.toString();
+      expiryDate = firstCard.expirationDate.toString();
+      cvvCode = firstCard.cvv.toString();
+      cardHolderName =
+          firstCard.cardHolder == null ? '' : firstCard.cardHolder!;
+    }
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,6 +70,7 @@ class _CreditCardPaymentPageState extends State<CreditCardPaymentPage> {
               _myPaddedWidget(
                 child: Column(
                   children: [
+                    // todo: replace values with data from riverpod
                     _orderInfo(title: 'Item(s) total:', cost: '\$10.42'),
                     _orderInfo(
                       title: '30% off coupon applied:',
@@ -69,6 +94,7 @@ class _CreditCardPaymentPageState extends State<CreditCardPaymentPage> {
               const SizedBox(height: 20),
               buildShoppingSecurity(context: context),
               const SizedBox(height: 20),
+              _buildErrorMessage(),
               _myPaddedWidget(
                 child: FilledButton.icon(
                   onPressed: _onValidate,
@@ -84,11 +110,51 @@ class _CreditCardPaymentPageState extends State<CreditCardPaymentPage> {
     );
   }
 
+  Widget _buildErrorMessage() {
+    return _errorMessage.isEmpty
+        ? const SizedBox.shrink()
+        : Column(
+            children: [
+              const SizedBox(height: 4),
+              Text(
+                _errorMessage,
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: Colors.red),
+              ),
+              const SizedBox(height: 4),
+            ],
+          );
+  }
+
   void _onValidate() {
+    setState(() => _errorMessage = '');
     if (formKey.currentState!.validate()) {
-      print('valid!');
+      // print('valid');
+      if (rememberThisCard == true) {
+        final PaymentCardModel card = PaymentCardModel(
+          cardNumber: cardNumber.trim(),
+          expirationDate: expiryDate.trim(),
+          cvv: cvvCode.trim(),
+          cardHolder: cardHolderName.trim(),
+        );
+        if (_objectBoxPaymentCardExists == true) {
+          // update
+          myObjectBox.updatePaymentCard(
+              newCardInfo: card, id: _objectBoxCardId);
+        } else {
+          // create
+          myObjectBox.createPaymentCard(card);
+        }
+      }
+      // todo: implement payment
+      Navigator.push(context, MaterialPageRoute(builder: (_) {
+        return const PaymentSuccessfulPage();
+      }));
     } else {
-      print('invalid!');
+      setState(() {
+        _errorMessage = 'Please fill in the card details marked *';
+      });
+      // print('invalid!');
     }
   }
 
@@ -166,7 +232,7 @@ class _CreditCardPaymentPageState extends State<CreditCardPaymentPage> {
       themeColor: themeColor,
       // textColor: Colors.white,
       cardNumberDecoration: InputDecoration(
-        labelText: '*Number',
+        labelText: '*Card number',
         hintText: 'XXXX XXXX XXXX XXXX',
         hintStyle: TextStyle(color: themeColor),
         labelStyle: TextStyle(color: themeColor),
@@ -182,6 +248,7 @@ class _CreditCardPaymentPageState extends State<CreditCardPaymentPage> {
         border: border,
         labelText: '*Expiration Date',
         hintText: 'XX/XX',
+        errorMaxLines: 2,
       ),
       cvvCodeDecoration: InputDecoration(
         suffixIcon: const Icon(Icons.lock_outline_rounded),
@@ -192,9 +259,9 @@ class _CreditCardPaymentPageState extends State<CreditCardPaymentPage> {
         border: border,
         labelText: '*CVV',
         hintText: 'XXX',
+        errorMaxLines: 2,
       ),
       cardHolderDecoration: InputDecoration(
-
         hintStyle: TextStyle(color: themeColor),
         labelStyle: TextStyle(color: themeColor),
         focusedBorder: border,

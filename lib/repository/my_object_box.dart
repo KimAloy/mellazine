@@ -1,3 +1,4 @@
+import 'package:mellazine/models/payment_card_model.dart';
 import 'package:mellazine/models/user_address_model.dart';
 import 'package:mellazine/objectbox.g.dart';
 
@@ -7,10 +8,12 @@ class MyObjectBox {
   late final Store _store;
   late final Box<ShoppingCartModel> _myShoppingCart;
   late final Box<AddAddressModel> _userAddress;
+  late final Box<PaymentCardModel> _paymentCard;
 
   MyObjectBox._init(this._store) {
     _myShoppingCart = Box<ShoppingCartModel>(_store);
     _userAddress = Box<AddAddressModel>(_store);
+    _paymentCard = Box<PaymentCardModel>(_store);
   }
 
   static Future<MyObjectBox> init() async {
@@ -111,5 +114,43 @@ class MyObjectBox {
     // deleteUserAddress(3);
     // print('my_object_box.. userIds: $userIds');
     return userIds;
+  }
+
+  /// paymentCard
+  // READ
+  PaymentCardModel? getPaymentCard(int id) => _paymentCard.get(id);
+
+  // CREATE
+  int createPaymentCard(PaymentCardModel user) => _paymentCard.put(user);
+
+  // DELETE
+  bool deletePaymentCard(int id) => _paymentCard.remove(id);
+
+  // UPDATE
+  updatePaymentCard({
+    required PaymentCardModel newCardInfo,
+    required int id,
+  }) {
+    // Get the object back from the box
+    PaymentCardModel oldCardInfo = _paymentCard.get(id)!;
+    // Update the object
+    oldCardInfo.cardNumber = newCardInfo.cardNumber;
+    oldCardInfo.expirationDate = newCardInfo.expirationDate;
+    oldCardInfo.cvv = newCardInfo.cvv;
+    oldCardInfo.cardHolder = newCardInfo.cardHolder;
+    createPaymentCard(oldCardInfo);
+  }
+
+  // QUERY IF CARDS EXIST
+  List<int> paymentCardsExist() {
+    List<int> cardIds = [];
+    List<PaymentCardModel> users = _paymentCard.query().build().find();
+    for (var i in users) {
+      cardIds.add(i.id);
+    }
+    // deleteUserAddress(2);
+    // deleteUserAddress(3);
+    // print('my_object_box.. cardIds: $cardIds');
+    return cardIds;
   }
 }

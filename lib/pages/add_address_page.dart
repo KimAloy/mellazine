@@ -225,12 +225,12 @@ class _AddAddressPageState extends State<AddAddressPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _infoTitle('Zip code'),
+        _infoTitle('*Zip code'),
         GoogleTextField(
           hintText: '',
           controller: _zipCodeController,
-          // validator: (value) =>
-          //     value!.isEmpty ? 'Please enter a valid zip code.' : null,
+          validator: (value) =>
+              value!.isEmpty ? 'Please enter a valid zip code.' : null,
         )
       ],
     );
