@@ -16,6 +16,7 @@ class BottomNavBar extends StatefulWidget {
 }
 
 class _BottomNavBarState extends State<BottomNavBar> {
+  final Icon _cartIcon= const Icon(Icons.shopping_cart_outlined);
   List<Widget> _buildScreens() {
     return [
       const HomePage(),
@@ -37,11 +38,12 @@ class _BottomNavBarState extends State<BottomNavBar> {
         inactiveColorPrimary: inactiveColorPrimary,
       ),
       PersistentBottomNavBarItem(
+        // todo: replace stream builder with riverpod here and in shopping_cart_page to avoid code duplication
         icon: StreamBuilder<List<ShoppingCartModel>>(
           stream: _shoppingCartStream,
           builder: (context, snapshot) {
             if (!snapshot.hasData) {
-              return const SizedBox.shrink();
+              return _cartIcon;
             } else {
               final cartList = snapshot.data!;
               int cartCount = 0;
@@ -57,11 +59,11 @@ class _BottomNavBarState extends State<BottomNavBar> {
               }
 
               return cartCount == 0
-                  ? const Icon(Icons.shopping_cart_outlined)
+                  ? _cartIcon
                   : Badge(
                       backgroundColor: Colors.deepOrange,
                       label: Text('$cartCount'),
-                      child: const Icon(Icons.shopping_cart_outlined),
+                      child: _cartIcon,
                     );
             }
           },

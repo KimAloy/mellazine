@@ -8,7 +8,9 @@ import 'package:mellazine/repository/number_formatter.dart';
 
 import '../constants/constants.dart';
 import '../main.dart';
+import '../repository/my_snack_bar.dart';
 import '../widgets/quantity_button.dart';
+import '../pages/add_address_page.dart';
 
 class ShoppingCartPage extends StatefulWidget {
   const ShoppingCartPage({Key? key}) : super(key: key);
@@ -50,6 +52,8 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
             // todo: replace with data form firestore
             ShopItemModel fetchItem = shopItemsList
                 .firstWhere((i) => i.itemId == shoppingCartItem.itemId);
+            // if item was deleted in firestore
+            // todo: delete item from objectbox if item was deleted in firestore
             // if item is still available
             if (fetchItem.availability == true) {
               availableInCartList.add(shoppingCartItem);
@@ -76,7 +80,7 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
               backgroundColor: Theme.of(context).colorScheme.inversePrimary,
               title: Text('Cart${cartCount == 0 ? '' : '($cartCount)'}'),
             ),
-            floatingActionButton: _myFloatingActionButton(),
+            floatingActionButton: _myFloatingActionButton(cartCount: cartCount),
             body: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -97,10 +101,7 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text('Item(s) total:', style: _myTextStyle),
-                        Text(
-                          '\$$totalPrice',
-                          style: _myTextStyle,
-                        ),
+                        Text('\$$totalPrice', style: _myTextStyle),
                       ],
                     ),
                   ),
@@ -498,8 +499,8 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
     return Text(
       '\$${numFormat(num: item.price)}',
       style: TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight.bold,
+        fontSize: 15,
+        fontWeight: FontWeight.w500,
         color: sellingOut ? Colors.deepOrange : Colors.black,
       ),
     );
@@ -551,7 +552,7 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
                             : '',
                     style: const TextStyle(
                       color: Colors.deepOrange,
-                      overflow: TextOverflow.ellipsis,
+                      overflow: TextOverflow.ellipsis,fontSize: 13
                     ),
                   ),
                 ],
@@ -591,31 +592,43 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
         });
   }
 
-  Widget _myFloatingActionButton() {
+  Widget _myFloatingActionButton({required int cartCount}) {
     return SizedBox(
-      width: 120,
-      height: 50,
+      width: 130,
+      height: 40,
       child: FloatingActionButton(
         backgroundColor: Colors.deepOrange,
         key: const Key('checkout'),
-        child: const Row(
+        child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              'Checkout ',
-              style: TextStyle(color: Colors.white, fontSize: 15),
+            const Icon(
+              Icons.shopping_cart_checkout,
+              color: Colors.white,
+              size: 18,
             ),
-            Icon(Icons.shopping_cart_checkout, color: Colors.white),
+            Text(
+              ' Checkout ${cartCount == 0 ? '' : '($cartCount) '}',
+              style: const TextStyle(color: Colors.white),
+            ),
           ],
         ),
         onPressed: () {
-          // todo: implement
           // print('checkout cart pressed');
+          if (cartCount > 0) {
+            Navigator.push(context, MaterialPageRoute(builder: (_) {
+              return const AddAddressPage();
+            }));
+          } else {
+            mySnackBar(context: context, message: 'Cart is empty');
+          }
         },
       ),
     );
   }
 
-  final TextStyle _myTextStyle =
-      const TextStyle(fontSize: 17, fontWeight: FontWeight.bold);
+  final TextStyle _myTextStyle = const TextStyle(
+    fontSize: 15,
+    fontWeight: FontWeight.w500,
+  );
 }

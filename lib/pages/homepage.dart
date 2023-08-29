@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../widgets/google_text_field.dart';
 import 'shop_items_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -44,7 +45,7 @@ class _HomePageState extends State<HomePage> {
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 12),
                 GoogleTextField(
                   hintText: 'e.g. @MrBeast  or  @MrBeast/001',
                   controller: accountTextController,
@@ -115,34 +116,3 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-class GoogleTextField extends StatelessWidget {
-  final String hintText;
-  final TextEditingController controller;
-
-  const GoogleTextField({
-    super.key,
-    required this.hintText,
-    required this.controller,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return TextField(
-      controller: controller,
-      decoration: InputDecoration(
-        hintText: hintText,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(20),
-          borderSide: BorderSide.none,
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(20),
-          // borderSide: BorderSide(width: 0.8),
-        ),
-        filled: true,
-        fillColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-        isDense: true,
-      ),
-    );
-  }
-}
