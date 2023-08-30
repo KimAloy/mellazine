@@ -10,9 +10,11 @@ class GoogleTextField extends StatelessWidget {
   final Function(String)? onChanged;
   final Widget? prefixIcon;
   final List<TextInputFormatter>? inputFormatters;
+  final bool autofocus;
 
   const GoogleTextField({
     super.key,
+    this.autofocus=false,
     this.prefixIcon,this.inputFormatters,
     this.onChanged,
     required this.hintText,
@@ -26,7 +28,7 @@ class GoogleTextField extends StatelessWidget {
     return Material(
       elevation: 1,
       borderRadius: BorderRadius.circular(20),
-      child: TextFormField(
+      child: TextFormField(autofocus: autofocus,
 inputFormatters: inputFormatters,
 onChanged: onChanged,
         controller: controller,

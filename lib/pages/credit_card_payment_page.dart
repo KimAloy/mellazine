@@ -5,6 +5,7 @@ import 'package:mellazine/main.dart';
 import 'package:mellazine/models/payment_card_model.dart';
 import 'package:mellazine/pages/payment_successful_page.dart';
 
+import '../widgets/items_pricing_info.dart';
 import '../widgets/my_colored_container_divider.dart';
 import '../widgets/security_sustainability_widget.dart';
 
@@ -67,30 +68,7 @@ class _CreditCardPaymentPageState extends State<CreditCardPaymentPage> {
               const SizedBox(height: 10),
               myColoredContainerDivider(),
               const SizedBox(height: 10),
-              _myPaddedWidget(
-                child: Column(
-                  children: [
-                    // todo: replace values with data from riverpod
-                    _orderInfo(title: 'Item(s) total:', cost: '\$10.42'),
-                    _orderInfo(
-                      title: '30% off coupon applied:',
-                      cost: '\$10.42',
-                      color: Colors.red,
-                    ),
-                    _orderInfo(title: 'Subtotal:', cost: '\$10.42'),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 10),
-              _myPaddedWidget(
-                child: Column(
-                  children: [
-                    _orderInfo(title: 'Shipping:', cost: 'FREE'),
-                    _orderInfo(title: 'Sales tax:', cost: '\$0.60'),
-                    _orderInfo(title: 'Order total:', cost: '\$7.90'),
-                  ],
-                ),
-              ),
+              itemsPricingInfo(),
               const SizedBox(height: 20),
               buildShoppingSecurity(context: context),
               const SizedBox(height: 20),

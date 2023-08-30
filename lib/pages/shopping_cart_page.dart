@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:mellazine/models/shop_item_model.dart';
 import 'package:mellazine/models/shopping_cart_model.dart';
 import 'package:mellazine/repository/number_formatter.dart';
@@ -59,7 +61,7 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
               availableInCartList.add(shoppingCartItem);
               fetchAvailableList.add(fetchItem);
               // if user has deselected the item
-              if (shoppingCartItem.deselected == false) {
+              if (shoppingCartItem.isSelected == true) {
                 cartCount = cartCount + shoppingCartItem.quantity;
                 // we put the checkout items in a list
                 checkoutItemsList.add(fetchItem);
@@ -86,7 +88,7 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const SizedBox(height: 10),
-                  _shoppingList(
+                  _buildShoppingList(
                     availableInCartList: availableInCartList,
                     fetchAvailableList: fetchAvailableList,
                     unavailableInCartList: unavailableInCartList,
@@ -190,7 +192,7 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
     );
   }
 
-  Widget _shoppingList({
+  Widget _buildShoppingList({
     required List<ShoppingCartModel> availableInCartList,
     required List<ShopItemModel> fetchAvailableList,
     required List<ShoppingCartModel> unavailableInCartList,
@@ -252,15 +254,13 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
       itemBuilder: (BuildContext context, int index) {
         ShoppingCartModel shoppingCartModel = cartList[index];
         ShopItemModel item = fetchedFirestoreList[index];
-        int quantity = shoppingCartModel.quantity;
-        int id = shoppingCartModel.id;
-        bool deselected = shoppingCartModel.deselected;
-        return _buildProduct(
-          item: item,
-          deselected: deselected,
-          qty: quantity,
-          objectBoxId: id,
-        );
+
+        return _buildProduct(fetchedItem: item, localData: shoppingCartModel
+            // isSelected: deselected,
+            // qty: quantity,
+            // objectBoxId: id,
+
+            );
       },
       separatorBuilder: (BuildContext context, int index) {
         return const SizedBox(height: 20);
@@ -269,11 +269,13 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
   }
 
   Widget _buildProduct({
-    required ShopItemModel item,
-    required int qty,
-    required int objectBoxId,
-    required bool deselected,
+    required ShopItemModel fetchedItem,
+    required ShoppingCartModel localData,
   }) {
+    int qty = localData.quantity;
+    bool isSelected = localData.isSelected;
+    String image = localData.itemImage;
+    int objectBoxId = localData.id;
     return GestureDetector(
       onTap: () {
         // todo: navigate to details page
@@ -286,27 +288,27 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
             GestureDetector(
               onTap: () {
                 // print('cool');
-                if (item.availability == true) {
+                if (fetchedItem.availability == true) {
                   myObjectBox.deselect(objectBoxId);
                 }
               },
               child: SizedBox(
                 height: _imageHeight,
                 child: Center(
-                  child: item.availability == false
+                  child: fetchedItem.availability == false
                       ? const Icon(Icons.check_circle, color: Colors.black12)
-                      : deselected == true
+                      : isSelected == false
                           ? const Icon(Icons.circle_outlined)
                           : const Icon(Icons.check_circle),
                 ),
               ),
             ),
             const SizedBox(width: 8),
-            _buildImage(item: item),
+            _buildImage(item: fetchedItem, image: image),
             const SizedBox(width: 8),
             Expanded(
               child: _buildItemInfo(
-                item: item,
+                item: fetchedItem,
                 qty: qty,
                 objectBoxId: objectBoxId,
               ),
@@ -317,7 +319,13 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
     );
   }
 
-  Widget _buildImage({required ShopItemModel item}) {
+  Widget _buildImage({
+    required String image,
+    required ShopItemModel item,
+  }) {
+    Uint8List bytes = base64Decode(image);
+    Image? myImage = Image.memory(bytes, fit: BoxFit.cover);
+
     return Container(
       height: _imageHeight,
       width: 100,
@@ -325,7 +333,7 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
         borderRadius: BorderRadius.circular(5),
         image: DecorationImage(
           // todo: replace with cached network image
-          image: AssetImage('assets/selling_now/${item.images[0]}'),
+          image: MemoryImage((base64Decode(image))),
           fit: BoxFit.cover,
           // opacity value 1.0 is flutter's default
           opacity: item.availability == false ? 1.6 : 1.0,
@@ -551,9 +559,9 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
                             ? 'Only ${item.inventory} left'
                             : '',
                     style: const TextStyle(
-                      color: Colors.deepOrange,
-                      overflow: TextOverflow.ellipsis,fontSize: 13
-                    ),
+                        color: Colors.deepOrange,
+                        overflow: TextOverflow.ellipsis,
+                        fontSize: 13),
                   ),
                 ],
               ),

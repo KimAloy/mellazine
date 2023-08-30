@@ -4,7 +4,7 @@ import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import '../main.dart';
 import '../models/shop_item_model.dart';
 import '../models/shopping_cart_model.dart';
-import '../pages/MyMellazinePage.dart';
+import '../pages/my_account_page.dart';
 import '../pages/shopping_cart_page.dart';
 import '../pages/homepage.dart';
 
@@ -21,7 +21,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
     return [
       const HomePage(),
       const ShoppingCartPage(),
-      const MyMellazinePage(),
+      const MyAccountPage(),
     ];
   }
 
@@ -53,7 +53,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
                     .firstWhere((i) => i.itemId == shoppingCartItem.itemId);
                 // if item is still available
                 if (fetchItem.availability == true &&
-                    shoppingCartItem.deselected == false) {
+                    shoppingCartItem.isSelected == true) {
                   cartCount = cartCount + shoppingCartItem.quantity;
                 }
               }

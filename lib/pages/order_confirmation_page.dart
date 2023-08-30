@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:mellazine/constants/constants.dart';
 import 'package:mellazine/pages/credit_card_payment_page.dart';
 import '../models/payment_method_model.dart';
 import '../widgets/google_text_field.dart';
+import 'mobile_money_payment_page.dart';
 
 class OrderConfirmationPage extends StatefulWidget {
   const OrderConfirmationPage({Key? key}) : super(key: key);
@@ -91,7 +93,9 @@ class _OrderConfirmationPageState extends State<OrderConfirmationPage> {
       onTap: () {
         //   print('method.name: ${method.name}');
         Navigator.push(context, MaterialPageRoute(builder: (_) {
-          return const CreditCardPaymentPage();
+          return method.type == kCard
+              ? const CreditCardPaymentPage()
+              :  MobileMoneyPaymentPage(paymentMethod: method);
         }));
       },
       child: Container(

@@ -4,3 +4,7 @@ const String kAlmostSoldOutString = 'Almost sold out';
 String kOnlyLeftString ({required int inventory}){
   return 'Only $inventory left';
 }
+String kCard = 'card';
+String kMobileMoney = 'mobile money';
+String kIncome = 'income';
+String kWithdraw = 'withdraw';

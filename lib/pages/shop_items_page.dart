@@ -246,6 +246,7 @@ class _ShopItemsPageState extends State<ShopItemsPage> {
                     GestureDetector(
                       onTap: () {
                         // print('add to shopping cart tapped');
+
                         addToCart(
                           item: item,
                           quantity: 1,

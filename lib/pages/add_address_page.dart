@@ -14,12 +14,13 @@ class AddAddressPage extends StatefulWidget {
 }
 
 class _AddAddressPageState extends State<AddAddressPage> {
-  String _selectedCountry = 'United States (US)';
-  String _selectedCountryPhoneCode = '+1';
+  String _selectedCountry = 'Uganda (UG)';
+  String _selectedCountryPhoneCode = '+256';
   TextEditingController _fullNameController = TextEditingController();
   TextEditingController _streetAddressController = TextEditingController();
   TextEditingController _apartmentEtcController = TextEditingController();
-  TextEditingController _zipCodeController = TextEditingController();
+  TextEditingController _zipCodeController =
+      TextEditingController(text: '000256');
   TextEditingController _cityController = TextEditingController();
   TextEditingController _stateController = TextEditingController();
   TextEditingController _phoneController = TextEditingController();

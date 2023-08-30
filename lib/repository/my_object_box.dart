@@ -2,6 +2,7 @@ import 'package:mellazine/models/payment_card_model.dart';
 import 'package:mellazine/models/user_address_model.dart';
 import 'package:mellazine/objectbox.g.dart';
 
+import '../models/mobile_money_phone_model.dart';
 import '../models/shopping_cart_model.dart';
 
 class MyObjectBox {
@@ -9,11 +10,13 @@ class MyObjectBox {
   late final Box<ShoppingCartModel> _myShoppingCart;
   late final Box<AddAddressModel> _userAddress;
   late final Box<PaymentCardModel> _paymentCard;
+  late final Box<MobileMoneyPhoneModel> _mobileMoneyPhone;
 
   MyObjectBox._init(this._store) {
     _myShoppingCart = Box<ShoppingCartModel>(_store);
     _userAddress = Box<AddAddressModel>(_store);
     _paymentCard = Box<PaymentCardModel>(_store);
+    _mobileMoneyPhone = Box<MobileMoneyPhoneModel>(_store);
   }
 
   static Future<MyObjectBox> init() async {
@@ -37,6 +40,7 @@ class MyObjectBox {
     ShoppingCartModel item = _myShoppingCart.get(id)!;
     // Update the object
     item.quantity = item.quantity + quantity;
+    item.isSelected = true;
     insertItem(item);
   }
 
@@ -52,7 +56,7 @@ class MyObjectBox {
     // Get the object back from the box
     ShoppingCartModel item = _myShoppingCart.get(id)!;
     // Update the object
-    item.deselected = !item.deselected;
+    item.isSelected = !item.isSelected;
     // print('my_object_box: ${item.deselected}');
     insertItem(item);
   }
@@ -145,6 +149,41 @@ class MyObjectBox {
   List<int> paymentCardsExist() {
     List<int> cardIds = [];
     List<PaymentCardModel> users = _paymentCard.query().build().find();
+    for (var i in users) {
+      cardIds.add(i.id);
+    }
+    // deleteUserAddress(2);
+    // deleteUserAddress(3);
+    // print('my_object_box.. cardIds: $cardIds');
+    return cardIds;
+  }
+
+  /// mobile money payment
+  // READ
+ MobileMoneyPhoneModel? getMomoNumber(int id) => _mobileMoneyPhone.get(id);
+
+  // CREATE
+  int createMomoNumber(MobileMoneyPhoneModel user) => _mobileMoneyPhone.put(user);
+
+  // DELETE
+  bool deleteMomoNumber(int id) => _mobileMoneyPhone.remove(id);
+
+  // UPDATE
+  updateMomoNumber({
+    required MobileMoneyPhoneModel newCardInfo,
+    required int id,
+  }) {
+    // Get the object back from the box
+    MobileMoneyPhoneModel oldCardInfo = _mobileMoneyPhone.get(id)!;
+    // Update the object
+    oldCardInfo.phoneNumber = newCardInfo.phoneNumber;
+    createMomoNumber(oldCardInfo);
+  }
+
+  // QUERY IF CARDS EXIST
+  List<int> momoExist() {
+    List<int> cardIds = [];
+    List<MobileMoneyPhoneModel> users = _mobileMoneyPhone.query().build().find();
     for (var i in users) {
       cardIds.add(i.id);
     }

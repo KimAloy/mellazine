@@ -5,12 +5,18 @@ class ShoppingCartModel {
   int id; // objectBoxId
   int quantity;
   final String itemId;
-  bool deselected;
+  final String itemImage;
+  final String sellerHashTag;
+  final String productName;
+  bool isSelected;
 
   ShoppingCartModel({
     this.id = 0,
-    required this.deselected,
+    required this.isSelected,
     required this.quantity,
     required this.itemId,
+    required this.itemImage,
+    required this.productName,
+    required this.sellerHashTag,
   });
 }
